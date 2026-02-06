@@ -4,31 +4,53 @@ format: html
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-Creating new variables, steps 1-3
-
+Exercise 3 
+Steps 1-3
 ```{r}
 library(tidyverse)
 library(ggplot2)
-f<-file.choose() #choose my dataset
+f<-"https://raw.githubusercontent.com/difiore/ada-datasets/main/data-wrangling.csv" #choose my dataset
 d<- read_csv(f, col_names = TRUE)
 names(d) #view my variable names
-BSD<- d$Body_mass_male_mean/d$Body_mass_female_mean #new variable body size dimorphism
-sex_ratio<- d$AdultFemale/d$AdultMales #new variable 
-DI<- d$DayLength_km/d$HomeRange_km2# new variable defensibility index
+d<- d %>%
+  mutate(BSD = Body_mass_male_mean/Body_mass_female_mean,
+         sex_ratio = AdultFemale/AdultMales,
+         diameter = 2 * sqrt(HomeRange_km2/pi),
+         DI = DayLength_km/diameter)
+view(d) #checking my new variables
 ```
+
+
 Plotting
+Step 4
 ```{r}
-ggplot()
-
-
-
-
+#overall plot
+plot1<- ggplot(data = d, aes(x = Move, y = DayLength_km, color = Family)) +
+  geom_point(na.rm = TRUE) +
+  xlab("Time Spent Moving") +
+  ylab("Day Range Length (km)")
+plot1
+#By family using facet wrap
+plot2<- d %>%
+  filter(!is.na(Move), !is.na(DayLength_km)) %>% #prevents family's with no data in these variables from facet wrapping into my plot
+  ggplot(aes(x = Move, y = DayLength_km, color = Family)) +
+  geom_point(na.rm = TRUE) +
+  xlab("Time Spent Moving") +
+  ylab("Day Range Length (km)") +
+  facet_wrap(vars(Family))
+plot2
 ```
+Step 4 Questions:
+Do species that spend more time moving travel farther overall? No. Overall it appears that regardless of time spent moving, most species travel within 0-3 km in a day.
+
+How about within any particular primate family? Cercopithecidae traveled the furthest and spent the most time moving. However, the individuals that moved the most were not the ones that traveled the furthest in a day.
+
+Should you transform either of these variables? Why or why not? I don't think you need to transform the data as neither appear skewed. When doing a log transformation of the variables, it led to negative values in Day Range Length which is something we would avoid doing.
+
+
+
+
+
+
+
+
