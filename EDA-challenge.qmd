@@ -12,10 +12,23 @@ Quarto enables you to weave together content and executable code into a finished
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
+Creating new variables, steps 1-3
+
 ```{r}
 library(tidyverse)
-library(readr)
-f<-file.choose()
+library(ggplot2)
+f<-file.choose() #choose my dataset
 d<- read_csv(f, col_names = TRUE)
+names(d) #view my variable names
+BSD<- d$Body_mass_male_mean/d$Body_mass_female_mean #new variable body size dimorphism
+sex_ratio<- d$AdultFemale/d$AdultMales #new variable 
+DI<- d$DayLength_km/d$HomeRange_km2# new variable defensibility index
+```
+Plotting
+```{r}
+ggplot()
+
+
+
 
 ```
