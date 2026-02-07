@@ -43,14 +43,74 @@ plot2
 Step 4 Questions:
 Do species that spend more time moving travel farther overall? No. Overall it appears that regardless of time spent moving, most species travel within 0-3 km in a day.
 
-How about within any particular primate family? Cercopithecidae traveled the furthest and spent the most time moving. However, the individuals that moved the most were not the ones that traveled the furthest in a day.
+How about within any particular primate family? Cercopithecidae traveled the furthest and spent the most time moving. However, the species that moved the most were not the ones that traveled the furthest in a day.
 
 Should you transform either of these variables? Why or why not? I don't think you need to transform the data as neither appear skewed. When doing a log transformation of the variables, it led to negative values in Day Range Length which is something we would avoid doing.
 
+Step 5
+```{r}
+#overall plot
+plot3<- ggplot(data = d, aes(x = MeanGroupSize, y = DayLength_km, color = Family)) +
+  geom_point(na.rm = TRUE) +
+  xlab("Group Size") +
+  ylab("Day Range Length (km)")
+plot3
+#By family using facet wrap
+plot4<- d %>%
+  filter(!is.na(MeanGroupSize), !is.na(DayLength_km)) %>% #prevents family's with no data in these variables from facet wrapping into my plot
+  ggplot(aes(x = MeanGroupSize, y = DayLength_km, color = Family)) +
+  geom_point(na.rm = TRUE) +
+  xlab("Group Size") +
+  ylab("Day Range Length (km)") +
+  facet_wrap(vars(Family))
+plot4
+```
+Step 5 Questions:
+Do species that live in larger groups travel farther, overall, in a day? Yes, it appears that species in larger groups moved the furthest in a day.
+
+How about within any particular primate family? For nearly every family, larger groups moved further. This is especially the case in the family Cercopithecidae.
+
+Should you transform either of these variables? Once again, I do not see a need to transform the data, as it does not appear skewed.
+
+Step 6:
+```{r}
+#overall plot
+plot5<- ggplot(data = d, aes(x = BSD, y = Canine_Dimorphism, color = Family)) +
+  geom_point(na.rm = TRUE) +
+  xlab("Body Size Dimorphism") +
+  ylab("Canine Dimorphism")
+plot5
+#By family using facet wrap
+plot6<- d %>%
+  filter(!is.na(BSD), !is.na(Canine_Dimorphism)) %>% #prevents family's with no data in these variables from facet wrapping into my plot
+  ggplot(aes(x = BSD, y = Canine_Dimorphism, color = Family)) +
+  geom_point(na.rm = TRUE) +
+  xlab("Body Size Dimorphism") +
+  ylab("Canine Dimorphism") +
+  facet_wrap(vars(Family))
+plot6
+```
+Step 6 Qusetion: 
+Do taxa with greater size dimorphism also show greater canine dimorphism? Yes, the majority of taxa show greater canine dimorphism with greater body size dimorphism.
+
+Step 7
+```{r}
+d<- d %>%
+  mutate(diet_strategy = ifelse(Fruit >= 50, "frugivore", ifelse(Leaves >= 50, "folivore",
+    ifelse(Fruit < 50 & Leaves < 50, "omnivore", NA))))
+view(d)
+```
 
 
-
-
-
-
+Step 8
+```{r}
+s<- d %>%
+  mutate(Binomial = paste0(Genus, "-", Species)) %>% 
+           select(Binomial, Family, Brain_Size_Species_Mean, Body_mass_male_mean) %>% 
+           group_by(Family) %>%
+  summarise(avgBrainSize = mean(Brain_Size_Species_Mean, na.rm = TRUE),
+            avgMaleBM = mean(Body_mass_male_mean, na.rm = TRUE)) %>%  
+  arrange((avgBrainSize))
+print(s)
+```
 
